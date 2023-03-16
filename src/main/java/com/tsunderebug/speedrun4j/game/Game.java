@@ -147,9 +147,15 @@ public class Game {
 			String modType = e.getValue();
 			if (modType.equals("moderator")) {
 				m = ModeratorType.MODERATOR;
-			} else if (modType.equals("super-moderator")) {
+			} 
+			else if (modType.equals("super-moderator")) {
 				m = ModeratorType.SUPER_MODERATOR;
-
+			}
+			else if (modType.equals("verifier")) {
+				m = ModeratorType.VERIFIER;
+			}
+			else {
+				throw new AssertionError("Unknown moderator type: " + modType);
 			}
 			modMap.put(u, m);
 		}
