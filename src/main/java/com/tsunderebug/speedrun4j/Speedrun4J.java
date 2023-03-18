@@ -22,7 +22,7 @@ public final class Speedrun4J {
 	
 	static {
 		String version = "@speedrun4JVersion@";
-		USER_AGENT_ROOT = version.indexOf('@') != -1 ? "Speedrun4j/DEVELOP" : "Speedrun4j/@speedrun4JVersion@";
+		USER_AGENT_ROOT = version.indexOf('@') != -1 ? "Speedrun4j/DEVELOP" : "Speedrun4j/" + version;
 	}
 	
 	private final String userAgent;
