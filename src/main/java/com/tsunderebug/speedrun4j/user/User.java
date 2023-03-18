@@ -6,7 +6,6 @@ import java.net.URL;
 import java.time.LocalDateTime;
 
 import com.google.gson.JsonObject;
-import com.tsunderebug.speedrun4j.JsonData;
 import com.tsunderebug.speedrun4j.LinkedJson;
 import com.tsunderebug.speedrun4j.util.URIFixer;
 
