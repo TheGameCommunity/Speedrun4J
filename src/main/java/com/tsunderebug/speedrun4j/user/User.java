@@ -1,117 +1,113 @@
 package com.tsunderebug.speedrun4j.user;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
-import com.tsunderebug.speedrun4j.Speedrun4J;
-import com.tsunderebug.speedrun4j.data.Link;
-import com.tsunderebug.speedrun4j.data.Resource;
-
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
+import java.time.LocalDateTime;
 
-public class User {
+import com.google.gson.JsonObject;
+import com.tsunderebug.speedrun4j.JsonData;
+import com.tsunderebug.speedrun4j.LinkedJson;
+import com.tsunderebug.speedrun4j.util.URIFixer;
 
-	private String id;
-	private Map<String, String> names;
-	private String weblink;
-	@SerializedName("name-style") private NameStyle nameStyle;
-	private String role;
-	private String signup;
-	private Location location;
-	private Resource twitch;
-	private Resource hitbox;
-	private Resource youtube;
-	private Resource twitter;
-	private Resource speedrunslive;
-	private Link[] links;
-
-	public static User fromID(String id) throws IOException {
-		Gson g = new Gson();
-		URL u = new URL(Speedrun4J.API_ROOT + "users/" + id);
-		HttpURLConnection c = (HttpURLConnection) u.openConnection();
-		c.addRequestProperty("User-Agent", Speedrun4J.USER_AGENT);
-		InputStreamReader r = new InputStreamReader(c.getInputStream());
-		UserData d = g.fromJson(r, UserData.class);
-		r.close();
-		return d.data;
+public class User implements LinkedJson {
+	
+	private final JsonObject data;
+	
+	public User(JsonObject json) {
+		this.data = json;
 	}
 
-	public static User fromApiKey(String key) throws IOException {
-		Gson g = new Gson();
-		URL u = new URL(Speedrun4J.API_ROOT + "profile");
-		HttpURLConnection c = (HttpURLConnection) u.openConnection();
-		c.addRequestProperty("User-Agent", Speedrun4J.USER_AGENT);
-		c.addRequestProperty("X-Api-Key", key);
-		InputStreamReader r = new InputStreamReader(c.getInputStream());
-		UserData d = g.fromJson(r, UserData.class);
-		r.close();
-		return d.data;
-	}
-
+	
 	public String getId() {
-		return id;
+		return data.get("id").getAsString();
 	}
 
+	
+	public String getName() {
+		return getName("international");
+	}
+	
+	public String getJapaneseName() {
+		return getName("japanese");
+	}
+	
 	/**
-	 * Valid keys: "international", "japanese"
+	 * Valid types: "international", "japanese"
 	 * Names can be null
 	 * @return A map of locales to user names
 	 */
-	public Map<String, String> getNames() {
-		return names;
+	public String getName(String type) {
+		JsonObject names = data.getAsJsonObject("names");
+		if(names.has(type)) {
+			return names.get(type).getAsString();
+		}
+		return "";
 	}
 
-	public String getWeblink() {
-		return weblink;
+	public URL getWeblink() throws MalformedURLException {
+		return new URL(URIFixer.fix(data.get("weblink")).getAsString());
 	}
 
 	public NameStyle getNameStyle() {
-		return nameStyle;
+		return null;
 	}
 
 	public String getRole() {
-		return role;
+		return data.get("role").getAsString();
 	}
 
-	public String getSignup() {
-		return signup;
+	public LocalDateTime getSignup() {
+		String date = data.get("created").getAsString();
+		return LocalDateTime.parse(date.substring(0, date.length() - 1));
 	}
 
 	public Location getLocation() {
-		return location;
+		if(data.has("location")) {
+			//return new Location(data.get("location"));
+		}
+		return null;
 	}
 
-	public Resource getTwitch() {
-		return twitch;
+	public URL getTwitch() {
+		return getSocial("twitch");
 	}
 
-	public Resource getHitbox() {
-		return hitbox;
+	public URL getHitbox() {
+		return getSocial("hitbox");
 	}
 
-	public Resource getYoutube() {
-		return youtube;
+	public URL getYoutube() {
+		return getSocial("youtube");
 	}
 
-	public Resource getTwitter() {
-		return twitter;
+	public URL getTwitter() {
+		return getSocial("twitter");
+	}
+	
+	public URL getSpeedrunsLive() {
+		return getSocial("speedrunslive");
+	}
+	
+	public URL getSocial(String socialNetwork) {
+		if(data.has(socialNetwork)) {
+			try {
+				return new URL(URIFixer.fix(data.get(socialNetwork)).getAsString());
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
-	public Resource getSpeedrunslive() {
-		return speedrunslive;
+	
+	public Record[] getPBs() throws IOException {
+		return null;
 	}
 
-	public Link[] getLinks() {
-		return links;
+	@Override
+	public JsonObject getData() {
+		return data.deepCopy();
 	}
-
-	public PersonalBests getPBs() throws IOException {
-		return PersonalBests.forUser(this);
-	}
-
-	private static class UserData{User data;}
 
 }

@@ -1,188 +1,109 @@
 package com.tsunderebug.speedrun4j.game;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
-import com.tsunderebug.speedrun4j.Speedrun4J;
-import com.tsunderebug.speedrun4j.data.Link;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Year;
+
+import com.google.gson.JsonObject;
+import com.tsunderebug.speedrun4j.JsonData;
 import com.tsunderebug.speedrun4j.game.run.Ruleset;
-import com.tsunderebug.speedrun4j.user.ModeratorType;
-import com.tsunderebug.speedrun4j.user.User;
+import com.tsunderebug.speedrun4j.platform.Platform;
+import com.tsunderebug.speedrun4j.user.GameStaff;
+import com.tsunderebug.speedrun4j.user.Moderator;
+import com.tsunderebug.speedrun4j.user.Supermod;
+import com.tsunderebug.speedrun4j.user.Verifier;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-public class Game {
-
-	private String id;
-	private Map<String, String> names;
-	private String abbreviation;
-	private String weblink;
-	private int released;
-	@SerializedName("release-date")
-	private String releaseDate;
-	private Ruleset ruleset;
-	@Deprecated
-	private boolean romhack;
-	private String[] gametypes;
-	private String[] platforms;
-	private String[] regions;
-	private String[] genres;
-	private String[] engines;
-	private String[] developers;
-	private String[] publishers;
-	private Map<String, String> moderators;
-	private String created;
-	private GameAssets assets;
-	private Link[] links;
-
-	public static Game fromID(String id) throws IOException {
-		Gson g = new Gson();
-		URL u = new URL(Speedrun4J.API_ROOT + "games/" + id);
-		HttpURLConnection c = (HttpURLConnection) u.openConnection();
-		c.setRequestProperty("User-Agent", Speedrun4J.USER_AGENT);
-		InputStreamReader r = new InputStreamReader(c.getInputStream());
-		GameData game = g.fromJson(r, GameData.class);
-		r.close();
-		return game.data;
+public class Game implements JsonData {
+	
+	private JsonObject gameData;
+	
+	public Game(JsonObject data) {
+		this.gameData = data;
 	}
-
-	public String getId() {
-		return id;
+	
+	public String getID() {
+		return gameData.get("id").getAsString();
 	}
-
-	/**
-	 * Valid keys: "international", "japanese", "twitch"
-	 * Names can be null
-	 *
-	 * @return A map of locales to game names
-	 */
-	public Map<String, String> getNames() {
-		return names;
+	
+	public String getName() {
+		return gameData.getAsJsonObject("names").get("international").getAsString();
 	}
-
-	/**
-	 * An abbreviation of the name, e.g. "smw" for Super Mario World
-	 *
-	 * @return An abbreviation of the name
-	 */
+	
 	public String getAbbreviation() {
-		return abbreviation;
+		return gameData.get("abbreviation").getAsString();
 	}
-
-	/**
-	 * The location of the game on Speedrun.com
-	 *
-	 * @return The url of the game page on Speedrun.com
-	 */
-	public String getWeblink() {
-		return weblink;
+	
+	public Year getReleaseYear() {
+		return Year.of(gameData.get("released").getAsInt());
 	}
-
-	/**
-	 * The year the game was released. For day and month, see getReleaseDate
-	 *
-	 * @return The release year of the game
-	 */
-	public int getReleased() {
-		return released;
+	
+	public LocalDate getReleaseDate() {
+		return LocalDate.parse(gameData.get("release-date").getAsString());
 	}
-
-	/**
-	 * @return Release date of the game in YYYY-MM-DD
-	 */
-	public String getReleaseDate() {
-		return releaseDate;
-	}
-
+	
 	public Ruleset getRuleset() {
-		return ruleset;
+		return new Ruleset(gameData.getAsJsonObject("ruleset"));
 	}
-
-	/**
-	 * @return whetger the game is a romhack
-	 * @deprecated use getGametypes instead
-	 */
-	@Deprecated
-	public boolean isRomhack() {
-		return romhack;
+	
+	public GameType[] getGameTypes() {
+		return null;
 	}
-
-	public String[] getGametypes() {
-		return gametypes;
+	
+	public Platform[] getPlatforms() {
+		return null;
 	}
-
-	public String[] getPlatforms() { // TODO return array of Platform objects
-		return platforms;
+	
+	public Region[] getRegions() {
+		return null;
 	}
-
-	public String[] getRegions() { // TODO return array of Region objects
-		return regions;
+	
+	public Genre[] getGenres() {
+		return null;
 	}
-
-	public String[] getGenres() {
-		return genres;
+	
+	public Engine[] getEngines() {
+		return null;
 	}
-
-	public String[] getEngines() {
-		return engines;
+	
+	public Developer[] getDevelopers() {
+		return null;
 	}
-
-	public String[] getDevelopers() {
-		return developers;
+	
+	public Publisher[] getPublishers() {
+		return null;
 	}
-
-	public String[] getPublishers() {
-		return publishers;
+	
+	public Supermod[] getSupermods() {
+		return null;
 	}
-
-	public Map<User, ModeratorType> getModerators() throws IOException {
-		Map<User, ModeratorType> modMap = new HashMap<>();
-		for (Map.Entry<String, String> e : moderators.entrySet()) {
-			User u = User.fromID(e.getKey());
-			ModeratorType m = null;
-			String modType = e.getValue();
-			if (modType.equals("moderator")) {
-				m = ModeratorType.MODERATOR;
-			} 
-			else if (modType.equals("super-moderator")) {
-				m = ModeratorType.SUPER_MODERATOR;
-			}
-			else if (modType.equals("verifier")) {
-				m = ModeratorType.VERIFIER;
-			}
-			else {
-				throw new AssertionError("Unknown moderator type: " + modType);
-			}
-			modMap.put(u, m);
-		}
-		return modMap;
+	
+	public Moderator[] getNormalModerators() {
+		return null;
 	}
-
-	/**
-	 * @return when the game page was created in YYYY-MM-DDTHH:MM:SSZ
-	 */
-	public String getCreated() {
-		return created;
+	
+	public Verifier[] getVerifiers() {
+		return null;
 	}
-
-	public GameAssets getAssets() {
-		return assets;
+	
+	public GameStaff[] getGameStaff() {
+		return null;
 	}
-
-	public Link[] getLinks() {
-		return links;
+	
+	public LocalDateTime getDateCreated() {
+		String date = gameData.get("created").getAsString();
+		return LocalDateTime.parse(date.substring(0, date.length() - 1));
 	}
-
-	public CategoryList getCategories() throws IOException {
-		return CategoryList.forGame(this);
+	
+	public Record[] getRecords() {
+		return getRecords(0);
 	}
-
-	private static class GameData {
-		Game data;
+	
+	public Record[] getRecords(int page) {
+		return null;
 	}
-
+	
+	public JsonObject getData() {
+		return gameData.deepCopy();
+	}
+	
 }

@@ -12,7 +12,7 @@ public class CategoryList {
 
 	private Category[] data;
 
-	public static CategoryList forGame(Game g) throws IOException {
+	public static CategoryList forGame(OldGame g) throws IOException {
 		Gson gson = new Gson();
 		URL u = new URL(Speedrun4J.API_ROOT + "games/" + g.getId() + "/categories");
 		HttpURLConnection c = (HttpURLConnection) u.openConnection();

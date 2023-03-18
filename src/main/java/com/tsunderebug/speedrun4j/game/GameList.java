@@ -10,7 +10,7 @@ import java.net.URL;
 
 public class GameList {
 
-	private Game[] data;
+	private OldGame[] data;
 
 	public static GameList withName(String name) throws IOException {
 		Gson g = new Gson();
@@ -23,7 +23,7 @@ public class GameList {
 		return l;
 	}
 
-	public Game[] getGames() {
+	public OldGame[] getGames() {
 		return data;
 	}
 

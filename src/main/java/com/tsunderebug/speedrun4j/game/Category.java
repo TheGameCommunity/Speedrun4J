@@ -54,9 +54,9 @@ public class Category {
 		return links;
 	}
 
-	public Game getGame() throws IOException {
+	public OldGame getGame() throws IOException {
 		String uri = Arrays.stream(links).filter((Link l) -> "game".equals(l.getRel())).findFirst().get().getUri();
-		return Game.fromID(uri.substring(uri.lastIndexOf('/') + 1));
+		return OldGame.fromID(uri.substring(uri.lastIndexOf('/') + 1));
 	}
 
 	public static Category fromID(String id) throws IOException {
