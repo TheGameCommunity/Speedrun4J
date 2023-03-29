@@ -1,11 +1,15 @@
 package com.tsunderebug.speedrun4j.game;
 
+import java.io.IOError;
+import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.util.function.Function;
 
 import com.google.gson.JsonObject;
-import com.tsunderebug.speedrun4j.JsonData;
+import com.tsunderebug.speedrun4j.LinkedJson;
 import com.tsunderebug.speedrun4j.Speedrun4J;
 import com.tsunderebug.speedrun4j.game.run.Ruleset;
 import com.tsunderebug.speedrun4j.platform.Platform;
@@ -13,8 +17,9 @@ import com.tsunderebug.speedrun4j.user.GameStaff;
 import com.tsunderebug.speedrun4j.user.Moderator;
 import com.tsunderebug.speedrun4j.user.Supermod;
 import com.tsunderebug.speedrun4j.user.Verifier;
+import com.tsunderebug.speedrun4j.util.Pagination;
 
-public class Game implements JsonData {
+public class Game implements LinkedJson {
 	
 	private Speedrun4J s4j;
 	private JsonObject gameData;
@@ -45,7 +50,7 @@ public class Game implements JsonData {
 	}
 	
 	public Ruleset getRuleset() {
-		return new Ruleset(gameData.getAsJsonObject("ruleset"));
+		return new Ruleset(s4j, gameData.getAsJsonObject("ruleset"));
 	}
 	
 	public GameType[] getGameTypes() {
@@ -104,6 +109,67 @@ public class Game implements JsonData {
 	public Record[] getRecords(int page) {
 		return null;
 	}
+	
+	/*
+	public Pagination<Run> getRuns() {
+		
+	}
+	
+	*/
+	
+	/*
+	public Pagination<Level> getLevels() {
+		
+	}
+	*/
+	
+	public Pagination<Category> getCategories() throws IOException {
+		Function<JsonObject, Category> jsonFactory = (json) -> {return new Category(s4j, json);};
+		Function<URL, Category> urlFactory = (url) -> {
+			try {
+				return jsonFactory.apply(s4j.getRawData(url));
+			} catch (IOException e) {
+				throw new IOError(e);
+			}
+		};
+		return new Pagination<Category>(s4j, getLink("categories"), jsonFactory, urlFactory);
+	}
+	
+	/*
+	public Pagination<Variable> getVariables() {
+		
+	}
+	*/
+	
+	/*
+	public Pagination<Record> getRecords() {
+		
+	}
+	*/
+	
+	/*
+	public Pagination<Series> getSeries() {
+		
+	}
+	*/
+	
+	/*
+	public Pagination<DerivedGame> getDerivedGames() {
+		
+	}
+	*/
+	
+	/*
+	public Pagination<DerivedGame> getRomHacks() {
+		return getDerivedGames();
+	}
+	*/
+	
+	/*
+	public Pagination<Leaderboard> getLeaderboard() {
+		
+	}
+	*/
 	
 	public JsonObject getData() {
 		return gameData.deepCopy();

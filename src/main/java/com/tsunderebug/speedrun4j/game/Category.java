@@ -1,77 +1,65 @@
 package com.tsunderebug.speedrun4j.game;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.tsunderebug.speedrun4j.LinkedJson;
 import com.tsunderebug.speedrun4j.Speedrun4J;
-import com.tsunderebug.speedrun4j.data.Link;
 import com.tsunderebug.speedrun4j.game.run.Playtype;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 
-public class Category {
+public class Category implements LinkedJson {
 
-	private String id;
-	private String name;
-	private String weblink;
-	private String type;
-	private String rules;
-	private Playtype players;
-	private boolean miscellaneous;
-	private Link[] links;
+	private final Speedrun4J s4j;
+	private final JsonObject data;
+	
+	public Category(Speedrun4J s4j, JsonObject data) {
+		this.s4j = s4j;
+		this.data = data;
+	}
 
 	public String getId() {
-		return id;
+		return data.get("id").getAsString();
 	}
 
 	public String getName() {
-		return name;
+		return data.get("name").getAsString();
 	}
 
-	public String getWeblink() {
-		return weblink;
+	public URL getLink() throws MalformedURLException {
+		return new URL(data.get("weblink").getAsString());
 	}
 
 	public String getType() {
-		return type;
+		return data.get("type").getAsString();
 	}
 
 	public String getRules() {
-		return rules;
+		return data.get("rules").getAsString();
 	}
 
 	public Playtype getPlayers() {
-		return players;
+		//TODO: implement
+		return null;
 	}
 
 	public boolean isMiscellaneous() {
-		return miscellaneous;
+		return data.get("miscellaneous").getAsBoolean();
 	}
 
-	public Link[] getLinks() {
-		return links;
+	public Game getGame() throws IOException {
+		return new Game(s4j, s4j.getRawData(this.getLink("game")));
 	}
 
-	public OldGame getGame() throws IOException {
-		String uri = Arrays.stream(links).filter((Link l) -> "game".equals(l.getRel())).findFirst().get().getUri();
-		return OldGame.fromID(uri.substring(uri.lastIndexOf('/') + 1));
+	@Override
+	public Speedrun4J getS4j() {
+		return s4j;
 	}
 
-	public static Category fromID(String id) throws IOException {
-		Gson g = new Gson();
-		URL u = new URL(Speedrun4J.API_ROOT + "categories/" + id);
-		HttpURLConnection c = (HttpURLConnection) u.openConnection();
-		c.setRequestProperty("User-Agent", Speedrun4J.USER_AGENT);
-		InputStreamReader r = new InputStreamReader(c.getInputStream());
-		CategoryData cd = g.fromJson(r, CategoryData.class);
-		r.close();
-		return cd.data;
-	}
-
-	private static class CategoryData {
-		Category data;
+	@Override
+	public JsonObject getData() {
+		return data.deepCopy();
 	}
 
 }

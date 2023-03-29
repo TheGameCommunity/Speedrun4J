@@ -11,9 +11,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import com.tsunderebug.speedrun4j.game.Category;
 import com.tsunderebug.speedrun4j.game.Game;
 import com.tsunderebug.speedrun4j.user.User;
-import com.tsunderebug.speedrun4j.util.Pagination;
 import com.tsunderebug.speedrun4j.util.URIFixer;
 
 public final class Speedrun4J {
@@ -53,17 +53,9 @@ public final class Speedrun4J {
 		return new User(this, getData(url).getAsJsonObject());
 	}
 	
-	public <T> T fromPagination(Paginated parent, int index) throws IOException {
-		if(parent instanceof Pagination) {
-			throw new UnsupportedOperationException("Call Pagination#fromPagination(int index) instead");
-		}
-		if(parent instanceof Game) {
-			return (T) new Game(this, getData(parent.getSelfLink()).getAsJsonObject());
-		}
-		else if (parent instanceof User) {
-			
-		}
-		throw new AssertionError(parent.getClass().getCanonicalName());
+	public Category getCategory(String categoryID) throws IOException {
+		URL url = new URL(Speedrun4J.API_ROOT + "categories/" + categoryID);
+		return new Category(this, getData(url).getAsJsonObject());
 	}
 	
 	public JsonElement getData(URL url) throws IOException {
