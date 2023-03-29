@@ -125,12 +125,15 @@ public final class Pagination<T extends JsonData> implements Paginated<T> {
 	
 	@Override
 	public Pagination<T> setMaxSize(int max) {
+		if(max < 1) {
+			throw new IndexOutOfBoundsException(max + "");
+		}
 		URL url = getSelfLink();
 		String nextSTR = url.toString();
 		int end = getOffset() + getSize();
 		Matcher maxMatcher = maxURIPattern.matcher(nextSTR);
 		
-		if(maxMatcher.matches()) {
+		if(maxMatcher.find()) {
 			nextSTR = maxMatcher.replaceFirst("&max=" + max);
 		}
 		else {
@@ -150,10 +153,13 @@ public final class Pagination<T extends JsonData> implements Paginated<T> {
 	@Override
 	@Deprecated
 	public Pagination<T> seek(int offset) {
+		if(offset < 0) {
+			throw new IndexOutOfBoundsException(offset + "");
+		}
 		String ret = this.getSelfLink().toString();
 		Matcher offsetMatcher = offsetURIPattern.matcher(ret);
 		
-		if(offsetMatcher.matches()) {
+		if(offsetMatcher.find()) {
 			ret = offsetMatcher.replaceFirst("&offset=" + offset);
 		}
 		else {
@@ -168,10 +174,12 @@ public final class Pagination<T extends JsonData> implements Paginated<T> {
 
 	@Override
 	public Pagination<T> seekPage(int page) {
+		if(page < 0) {
+			throw new IndexOutOfBoundsException(page + "");
+		}
 		String ret = this.getSelfLink().toString();
 		Matcher offsetMatcher = offsetURIPattern.matcher(ret);
-		
-		if(offsetMatcher.matches()) {
+		if(offsetMatcher.find()) {
 			ret = offsetMatcher.replaceFirst("&offset=" + page * getMax());
 		}
 		else {

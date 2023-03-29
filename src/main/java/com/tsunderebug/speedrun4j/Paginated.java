@@ -28,7 +28,7 @@ public interface Paginated<T> extends LinkedJson, Iterable<T> {
 	 * @return the current page number
 	 */
 	public default int getPage() {
-		return getOffset() % getMax();
+		return getOffset() / getMax();
 	}
 	
 	/**
