@@ -1,5 +1,7 @@
 package com.tsunderebug.speedrun4j;
 
+import java.util.ListIterator;
+
 public interface Paginated<T> extends LinkedJson, Iterable<T> {
 	
 	/**
@@ -69,6 +71,8 @@ public interface Paginated<T> extends LinkedJson, Iterable<T> {
 	 * @return a page with the offset of `page` * `getMax()`
 	 */
 	public Paginated<T> seekPage(int page);
+	
+	public ListIterator<Paginated<T>> pageIterator();
 	
 	public boolean hasNextPage();
 	

@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.tsunderebug.speedrun4j.JsonData;
 import com.tsunderebug.speedrun4j.Paginated;
@@ -57,35 +58,11 @@ public final class Pagination<T extends JsonData> implements Paginated<T> {
 	}
 	
 	private URL getNext() {
-		if(hasLinks()) {
-			JsonArray links = getPaginationData().getAsJsonArray("links");
-			for(JsonElement e : links) {
-				if(e.getAsJsonObject().get("rel").getAsString().equals("next")) {
-					try {
-						return new URL(e.getAsJsonObject().get("rel").getAsString());
-					} catch (MalformedURLException e1) {
-						e1.printStackTrace();
-					}
-				}
-			}
-		}
-		return null;
+		return getLink("next");
 	}
 	
 	private URL getPrevious() {
-		if(hasLinks()) {
-			JsonArray links = getPaginationData().getAsJsonArray("links");
-			for(JsonElement e : links) {
-				if(e.getAsJsonObject().get("rel").getAsString().equals("prev")) {
-					try {
-						return new URL(e.getAsJsonObject().get("rel").getAsString());
-					} catch (MalformedURLException e1) {
-						e1.printStackTrace();
-					}
-				}
-			}
-		}
-		return null;
+		return getLink("prev");
 	}
 	
 	/**
@@ -110,7 +87,12 @@ public final class Pagination<T extends JsonData> implements Paginated<T> {
 	}
 	
 	public JsonObject getPaginationData() {
-		return getData().getAsJsonObject("pagination");
+		JsonObject o = getData().getAsJsonObject("pagination");
+		if(o == null) {
+			System.err.println(url);
+			System.err.println(getData().toString());
+		}
+		return o;
 	}
 	
 	@Override
@@ -185,7 +167,6 @@ public final class Pagination<T extends JsonData> implements Paginated<T> {
 		else {
 			ret = ret + "&offset=" + page * getMax();
 		}
-		System.out.println(ret);
 		try {
 			return new Pagination<T>(new URL(ret), this);
 		} catch (MalformedURLException e) {
@@ -204,36 +185,176 @@ public final class Pagination<T extends JsonData> implements Paginated<T> {
 		}
 		return null;
 	}
-
-	@Override
-	public Iterator<T> iterator() {
-		JsonArray data = getData().getAsJsonArray("data");
-		int size = data.size();
-		return new Iterator<T>() {
+	
+	public ListIterator<T> iterator() {
+		return new ListIterator<T>() {
+			ListIterator<Paginated<T>> pageIterator = pageIterator();
+			Paginated<T> page = Pagination.this;
 			int index = 0;
 			@Override
 			public boolean hasNext() {
-				return index < size;
+				if(index < page.getSize()) {
+					return true;
+				}
+				else {
+					if (pageIterator.hasNext()) { //sometimes the api can return an empty page, so we have to check if the size of the next page is 0
+						boolean valid = pageIterator.next().getSize() > 0;
+						pageIterator.previous();
+						return valid;
+					}
+				}
+				return false;
 			}
 
 			@Override
 			public T next() {
-				T ret = jsonFactory.apply(data.get(index).getAsJsonObject());
-				index++;
-				return ret;
+				if(index < page.getSize()) {
+					return page.get(index++);
+				}
+				else if(pageIterator.hasNext()) {
+					page = page.next();
+					pageIterator = page.pageIterator();
+					index = 0;
+					return page.get(index++);
+				}
+				else {
+					return null;
+				}
+			}
+
+			@Override
+			public boolean hasPrevious() {
+				return index > 0 || pageIterator.hasPrevious();
+			}
+
+			@Override
+			public T previous() {
+				if(index > 0) {
+					return page.get(index--);
+				}
+				else if(pageIterator.hasPrevious()) {
+					page = page.prev();
+					pageIterator = page.pageIterator();
+					index = page.getSize();
+					return page.get(index--);
+				}
+				return null;
+			}
+
+			@Override
+			public int nextIndex() {
+				return -1;
+			}
+
+			@Override
+			public int previousIndex() {
+				return -1;
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public void set(T e) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public void add(T e) {
+				throw new UnsupportedOperationException();
 			}
 			
 		};
 	}
 
 	@Override
+	public ListIterator<Paginated<T>> pageIterator() {
+		return new ListIterator<Paginated<T>>() {
+			Paginated<T> current = Pagination.this;
+			
+			@Override
+			public boolean hasNext() {
+				return current.hasNextPage();
+			}
+			
+			@Override
+			public Paginated<T> next() {
+				return current = current.next();
+			}
+			
+			@Override
+			public boolean hasPrevious() {
+				return current.hasPreviousPage();
+			}
+			
+			@Override
+			public Paginated<T> previous() {
+				return current = current.prev();
+			}
+			
+			@Override
+			public int nextIndex() {
+				return getPage() + 1;
+			}
+			
+			@Override
+			public int previousIndex() {
+				return getPage() - 1;
+			}
+			
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+			
+			@Override
+			public void set(Paginated<T> e) {
+				throw new UnsupportedOperationException();
+			}
+			
+			@Override
+			public void add(Paginated<T> e) {
+				throw new UnsupportedOperationException();
+			}
+			
+		};
+	}
+	
+	public Stream<T> stream() {
+		Iterator<T> iterator = iterator();
+		
+		return Stream.iterate(
+			get(0),
+			(obj) -> {
+				return(iterator.hasNext() || pageIterator().hasNext());
+			},
+			(obj) -> {
+				if(iterator.hasNext()) {
+					return iterator.next();
+				}
+				else if(pageIterator().hasNext()) {
+					return pageIterator().next().get(0);
+				}
+				return null;
+			}
+		);
+	}
+	
+	@Override
+	public JsonArray getLinks() {
+		return data.getData().getAsJsonObject("pagination").getAsJsonArray("links");
+	}
+
+	@Override
 	public boolean hasNextPage() {
-		return data.asLinkedJson().hasLink("next");
+		return hasLink("next");
 	}
 
 	@Override
 	public boolean hasPreviousPage() {
-		return data.asLinkedJson().hasLink("prev");
+		return hasLink("prev");
 	}
 	
 }

@@ -1,6 +1,7 @@
 package com.tsunderebug.speedrun4j;
 
 import java.io.IOException;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -14,7 +15,7 @@ public class TestMain {
 		Speedrun4J s4j = new Speedrun4J("Speedrun4J Test");
 		try {
 			Game game = s4j.getGame("ebtr");
-			User user = s4j.getUser("Gamebuster1990");
+			User user = s4j.getUser("Wolsk");
 			JsonArray links = game.getData().getAsJsonArray("links");
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			/*for(JsonElement e : links) {
@@ -24,16 +25,13 @@ public class TestMain {
 			}*/
 			System.out.println(gson.toJson(user.getData()));
 			//URL games = user.getLink("games");
-			Pagination<Game> games = user.getModeratedGames();//.setMaxSize(1);
-			games = games.setMaxSize(1);
-			games = games.seekPage(1);
-			games.getSelfLink();
-			System.out.println(gson.toJson(games.getData()));
-			System.out.println(games.get(0).getName());
-			games = games.prev();
-			System.out.println(games.get(0).getName());
-			games = games.next();
-			System.out.println(games.get(0).getName());
+			Pagination<Game> games = user.getModeratedGames().setMaxSize(20);
+			
+			for(Game g : games) {
+				System.out.println(g.getName());
+			}
+
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
