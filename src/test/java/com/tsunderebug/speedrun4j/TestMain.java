@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.tsunderebug.speedrun4j.game.Game;
 import com.tsunderebug.speedrun4j.user.User;
+import com.tsunderebug.speedrun4j.util.Pagination;
 
 public class TestMain {
 
@@ -22,6 +23,17 @@ public class TestMain {
 				}
 			}*/
 			System.out.println(gson.toJson(user.getData()));
+			//URL games = user.getLink("games");
+			Pagination<Game> games = user.getModeratedGames();//.setMaxSize(1);
+			games = games.setMaxSize(1);
+			games = games.seekPage(1);
+			games.getSelfLink();
+			System.out.println(gson.toJson(games.getData()));
+			System.out.println(games.get(0).getName());
+			games = games.prev();
+			System.out.println(games.get(0).getName());
+			games = games.next();
+			System.out.println(games.get(0).getName());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -6,6 +6,7 @@ import java.time.Year;
 
 import com.google.gson.JsonObject;
 import com.tsunderebug.speedrun4j.JsonData;
+import com.tsunderebug.speedrun4j.Speedrun4J;
 import com.tsunderebug.speedrun4j.game.run.Ruleset;
 import com.tsunderebug.speedrun4j.platform.Platform;
 import com.tsunderebug.speedrun4j.user.GameStaff;
@@ -15,9 +16,11 @@ import com.tsunderebug.speedrun4j.user.Verifier;
 
 public class Game implements JsonData {
 	
+	private Speedrun4J s4j;
 	private JsonObject gameData;
 	
-	public Game(JsonObject data) {
+	public Game(Speedrun4J s4j, JsonObject data) {
+		this.s4j = s4j;
 		this.gameData = data;
 	}
 	
@@ -104,6 +107,11 @@ public class Game implements JsonData {
 	
 	public JsonObject getData() {
 		return gameData.deepCopy();
+	}
+
+	@Override
+	public Speedrun4J getS4j() {
+		return s4j;
 	}
 	
 }

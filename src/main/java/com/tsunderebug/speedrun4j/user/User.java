@@ -1,19 +1,26 @@
 package com.tsunderebug.speedrun4j.user;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.function.Function;
 
 import com.google.gson.JsonObject;
 import com.tsunderebug.speedrun4j.LinkedJson;
+import com.tsunderebug.speedrun4j.Speedrun4J;
+import com.tsunderebug.speedrun4j.game.Game;
+import com.tsunderebug.speedrun4j.util.Pagination;
 import com.tsunderebug.speedrun4j.util.URIFixer;
 
 public class User implements LinkedJson {
 	
+	private final Speedrun4J s4j;
 	private final JsonObject data;
 	
-	public User(JsonObject json) {
+	public User(Speedrun4J s4j, JsonObject json) {
+		this.s4j = s4j;
 		this.data = json;
 	}
 
@@ -21,7 +28,6 @@ public class User implements LinkedJson {
 	public String getId() {
 		return data.get("id").getAsString();
 	}
-
 	
 	public String getName() {
 		return getName("international");
@@ -91,7 +97,7 @@ public class User implements LinkedJson {
 	public URL getSocial(String socialNetwork) {
 		if(data.has(socialNetwork)) {
 			try {
-				return new URL(URIFixer.fix(data.get(socialNetwork)).getAsString());
+				return new URL(data.get(socialNetwork).getAsString());
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
@@ -107,6 +113,23 @@ public class User implements LinkedJson {
 	@Override
 	public JsonObject getData() {
 		return data.deepCopy();
+	}
+
+	public Pagination<Game> getModeratedGames() throws IOException {
+		Function<JsonObject, Game> jsonFactory = (json) -> {return new Game(s4j, json);};
+		Function<URL, Game> urlFactory = (url) -> {
+			try {
+				return jsonFactory.apply(s4j.getRawData(url));
+			} catch (IOException e) {
+				throw new IOError(e);
+			}
+		};
+		return new Pagination<Game>(s4j, getLink("games"), jsonFactory, urlFactory);
+	}
+
+	@Override
+	public Speedrun4J getS4j() {
+		return s4j;
 	}
 
 }

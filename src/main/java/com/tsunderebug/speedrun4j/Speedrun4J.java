@@ -13,6 +13,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.tsunderebug.speedrun4j.game.Game;
 import com.tsunderebug.speedrun4j.user.User;
+import com.tsunderebug.speedrun4j.util.Pagination;
+import com.tsunderebug.speedrun4j.util.URIFixer;
 
 public final class Speedrun4J {
 
@@ -43,12 +45,25 @@ public final class Speedrun4J {
 	
 	public Game getGame(String gameID) throws IOException {
 		URL url = new URL(Speedrun4J.API_ROOT + "games/" + gameID);
-		return new Game(getData(url).getAsJsonObject());
+		return new Game(this, getData(url).getAsJsonObject());
 	}
 	
 	public User getUser(String userID) throws IOException {
 		URL url = new URL(Speedrun4J.API_ROOT + "users/" + userID);
-		return new User(getData(url).getAsJsonObject());
+		return new User(this, getData(url).getAsJsonObject());
+	}
+	
+	public <T> T fromPagination(Paginated parent, int index) throws IOException {
+		if(parent instanceof Pagination) {
+			throw new UnsupportedOperationException("Call Pagination#fromPagination(int index) instead");
+		}
+		if(parent instanceof Game) {
+			return (T) new Game(this, getData(parent.getSelfLink()).getAsJsonObject());
+		}
+		else if (parent instanceof User) {
+			
+		}
+		throw new AssertionError(parent.getClass().getCanonicalName());
 	}
 	
 	public JsonElement getData(URL url) throws IOException {
@@ -63,8 +78,8 @@ public final class Speedrun4J {
 		c.setRequestProperty("User-Agent", userAgent);
 		InputStreamReader r = new InputStreamReader(c.getInputStream());
 		JsonReader json = GSON.newJsonReader(r);
-		JsonObject data = JsonParser.parseReader(json).getAsJsonObject();
-		return data;
+		JsonElement data = JsonParser.parseReader(json);
+		return JsonParser.parseString(URIFixer.fix(data.toString())).getAsJsonObject();
 	}
 	
 }
