@@ -1,15 +1,15 @@
 package com.tsunderebug.speedrun4j.game;
 
 import com.google.gson.JsonObject;
+import com.tsunderebug.speedrun4j.Identified;
 import com.tsunderebug.speedrun4j.LinkedJson;
 import com.tsunderebug.speedrun4j.Speedrun4J;
+import com.tsunderebug.speedrun4j.WebLinked;
 import com.tsunderebug.speedrun4j.game.run.Playtype;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
-public class Category implements LinkedJson {
+public class Category implements LinkedJson, Identified, WebLinked {
 
 	private final Speedrun4J s4j;
 	private final JsonObject data;
@@ -19,20 +19,8 @@ public class Category implements LinkedJson {
 		this.data = data;
 	}
 
-	public String getId() {
-		return data.get("id").getAsString();
-	}
-
-	public String getName() {
-		return data.get("name").getAsString();
-	}
-
-	public URL getLink() throws MalformedURLException {
-		return new URL(data.get("weblink").getAsString());
-	}
-
-	public String getType() {
-		return data.get("type").getAsString();
+	public CategoryType getType() {
+		return CategoryType.fromString(data.get("type").getAsString());
 	}
 
 	public String getRules() {
@@ -40,8 +28,7 @@ public class Category implements LinkedJson {
 	}
 
 	public Playtype getPlayers() {
-		//TODO: implement
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isMiscellaneous() {
@@ -50,6 +37,10 @@ public class Category implements LinkedJson {
 
 	public Game getGame() throws IOException {
 		return new Game(s4j, s4j.getRawData(this.getLink("game")));
+	}
+	
+	public Variable[] getVariables() throws IOException {
+		return s4j.getVariables(this);
 	}
 
 	@Override
@@ -62,4 +53,29 @@ public class Category implements LinkedJson {
 		return data.deepCopy();
 	}
 
+	public static enum CategoryType {
+		FULL_GAME("per-game"),
+		INDIVIDUAL_LEVEL("per-level"),
+		UNKNOWN("unknown");
+
+		private final String name;
+		
+		CategoryType(String name) {
+			this.name = name;
+		}
+		
+		public String toString() {
+			return name;
+		}
+		
+		public static CategoryType fromString(String type) {
+			for(CategoryType t : values()) {
+				if(t.name.equals(type)) {
+					return t;
+				}
+			}
+			return UNKNOWN;
+		}
+	}
+	
 }

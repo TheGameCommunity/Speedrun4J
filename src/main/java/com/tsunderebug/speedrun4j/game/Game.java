@@ -1,25 +1,22 @@
 package com.tsunderebug.speedrun4j.game;
 
-import java.io.IOError;
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
-import java.util.function.Function;
-
 import com.google.gson.JsonObject;
+import com.tsunderebug.speedrun4j.Identified;
 import com.tsunderebug.speedrun4j.LinkedJson;
 import com.tsunderebug.speedrun4j.Speedrun4J;
+import com.tsunderebug.speedrun4j.WebLinked;
 import com.tsunderebug.speedrun4j.game.run.Ruleset;
 import com.tsunderebug.speedrun4j.platform.Platform;
 import com.tsunderebug.speedrun4j.user.GameStaff;
 import com.tsunderebug.speedrun4j.user.Moderator;
 import com.tsunderebug.speedrun4j.user.Supermod;
 import com.tsunderebug.speedrun4j.user.Verifier;
-import com.tsunderebug.speedrun4j.util.Pagination;
 
-public class Game implements LinkedJson {
+public class Game implements LinkedJson, Identified, WebLinked {
 	
 	private Speedrun4J s4j;
 	private JsonObject gameData;
@@ -27,14 +24,6 @@ public class Game implements LinkedJson {
 	public Game(Speedrun4J s4j, JsonObject data) {
 		this.s4j = s4j;
 		this.gameData = data;
-	}
-	
-	public String getID() {
-		return gameData.get("id").getAsString();
-	}
-	
-	public String getName() {
-		return gameData.getAsJsonObject("names").get("international").getAsString();
 	}
 	
 	public String getAbbreviation() {
@@ -110,6 +99,10 @@ public class Game implements LinkedJson {
 		return null;
 	}
 	
+	public Category[] getCategories() throws IOException {
+		return s4j.getCategories(this);
+	}
+	
 	/*
 	public Pagination<Run> getRuns() {
 		
@@ -122,18 +115,6 @@ public class Game implements LinkedJson {
 		
 	}
 	*/
-	
-	public Pagination<Category> getCategories() throws IOException {
-		Function<JsonObject, Category> jsonFactory = (json) -> {return new Category(s4j, json);};
-		Function<URL, Category> urlFactory = (url) -> {
-			try {
-				return jsonFactory.apply(s4j.getRawData(url));
-			} catch (IOException e) {
-				throw new IOError(e);
-			}
-		};
-		return new Pagination<Category>(s4j, getLink("categories"), jsonFactory, urlFactory);
-	}
 	
 	/*
 	public Pagination<Variable> getVariables() {

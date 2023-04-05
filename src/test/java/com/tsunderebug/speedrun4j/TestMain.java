@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.tsunderebug.speedrun4j._fedata.ModeratedGame;
 import com.tsunderebug.speedrun4j._fedata.PlayedGame;
+import com.tsunderebug.speedrun4j.game.Category;
 import com.tsunderebug.speedrun4j.game.Game;
 import com.tsunderebug.speedrun4j.user.User;
 import com.tsunderebug.speedrun4j.util.Pagination;
@@ -41,6 +42,10 @@ public class TestMain {
 			ModeratedGame[] moderatedGames = user.getUserStats().getModeratedGames();
 			for(ModeratedGame g: moderatedGames) {
 				System.out.println(g.getName() + ": " + g.getModLevel());
+			}
+			
+			for(Category category : game.getCategories()) {
+				System.out.println(category.getName() + ": " + category.getType());
 			}
 			
 		} catch (IOException e) {
