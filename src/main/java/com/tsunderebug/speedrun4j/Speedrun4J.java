@@ -17,6 +17,8 @@ import com.tsunderebug.speedrun4j.game.Category;
 import com.tsunderebug.speedrun4j.game.Game;
 import com.tsunderebug.speedrun4j.game.Level;
 import com.tsunderebug.speedrun4j.game.Variable;
+import com.tsunderebug.speedrun4j.game.run.Player;
+import com.tsunderebug.speedrun4j.game.run.Run;
 import com.tsunderebug.speedrun4j.user.User;
 import com.tsunderebug.speedrun4j.util.URIFixer;
 import com.tsunderebug.speedrun4j.util.Undocumented;

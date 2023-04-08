@@ -91,11 +91,11 @@ public class Game implements LinkedJson, Identified, WebLinked {
 		return LocalDateTime.parse(date.substring(0, date.length() - 1));
 	}
 	
-	public Record[] getRecords() {
+	public Run[] getRecords() {
 		return getRecords(0);
 	}
 	
-	public Record[] getRecords(int page) {
+	public Run[] getRecords(int page) {
 		return null;
 	}
 	

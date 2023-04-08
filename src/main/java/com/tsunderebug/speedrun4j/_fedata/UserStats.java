@@ -4,13 +4,13 @@ import java.io.IOException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tsunderebug.speedrun4j.JsonData;
+import com.tsunderebug.speedrun4j.JsonObjectData;
 import com.tsunderebug.speedrun4j.Speedrun4J;
 import com.tsunderebug.speedrun4j.user.User;
 import com.tsunderebug.speedrun4j.util.Undocumented;
 
 @Undocumented
-public class UserStats implements JsonData {
+public class UserStats implements JsonObjectData {
 
 	private final Speedrun4J s4j;
 	private final JsonObject data;

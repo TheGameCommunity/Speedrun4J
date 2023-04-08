@@ -1,10 +1,10 @@
 package com.tsunderebug.speedrun4j.game.run;
 
 import com.google.gson.JsonObject;
-import com.tsunderebug.speedrun4j.JsonData;
+import com.tsunderebug.speedrun4j.JsonObjectData;
 import com.tsunderebug.speedrun4j.Speedrun4J;
 
-public class Ruleset implements JsonData {
+public class Ruleset implements JsonObjectData {
 	
 	private Speedrun4J s4j;
 	private JsonObject ruleData;

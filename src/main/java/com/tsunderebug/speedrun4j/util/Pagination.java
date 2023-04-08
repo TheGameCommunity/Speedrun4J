@@ -12,25 +12,25 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tsunderebug.speedrun4j.JsonData;
+import com.tsunderebug.speedrun4j.JsonObjectData;
 import com.tsunderebug.speedrun4j.Paginated;
 import com.tsunderebug.speedrun4j.Speedrun4J;
 
-public final class Pagination<T extends JsonData> implements Paginated<T> {
+public final class Pagination<T extends JsonObjectData> implements Paginated<T> {
 	
 	private static final Pattern maxURIPattern = Pattern.compile("&max=\\d{1,3}");
 	private static final Pattern offsetURIPattern = Pattern.compile("&offset=\\d{1,3}");
 	
-	private final JsonData data;
+	private final JsonObjectData data;
 	private final URL url;
 	private final Function<JsonObject, T> jsonFactory;
 	private final Function<URL, T> urlFactory;
 	
 	public Pagination(Speedrun4J s4j, URL url, Function<JsonObject, T> jsonFactory, Function<URL, T> urlFactory) throws IOException {
-		this(url, JsonData.asJsonData(s4j, s4j.getRawData(url)), jsonFactory, urlFactory);
+		this(url, JsonObjectData.asJsonData(s4j, s4j.getRawData(url)), jsonFactory, urlFactory);
 	}
 	
-	private Pagination(URL url, JsonData data, Function<JsonObject, T> jsonFactory, Function<URL, T> urlFactory) {
+	private Pagination(URL url, JsonObjectData data, Function<JsonObject, T> jsonFactory, Function<URL, T> urlFactory) {
 		this.url = url;
 		this.data = data;
 		this.jsonFactory = jsonFactory;

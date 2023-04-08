@@ -7,7 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public interface LinkedJson extends JsonData {
+public interface LinkedJson extends JsonObjectData {
 
 	public default JsonArray getLinks() {
 		return this.getData().getAsJsonArray("links");

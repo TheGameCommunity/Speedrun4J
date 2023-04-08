@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.tsunderebug.speedrun4j.JsonData;
+import com.tsunderebug.speedrun4j.JsonObjectData;
 import com.tsunderebug.speedrun4j.LinkedJson;
 import com.tsunderebug.speedrun4j.Speedrun4J;
 
@@ -93,7 +93,7 @@ public class Variable implements LinkedJson {
 		return data.deepCopy();
 	}
 	
-	public static final class Value implements JsonData {
+	public static final class Value implements JsonObjectData {
 
 		private final Speedrun4J s4j;
 		private final String id;
@@ -137,7 +137,7 @@ public class Variable implements LinkedJson {
 		
 	}
 
-	public static final class Scope implements JsonData {
+	public static final class Scope implements JsonObjectData {
 		
 		protected final Speedrun4J s4j;
 		protected final JsonObject data;

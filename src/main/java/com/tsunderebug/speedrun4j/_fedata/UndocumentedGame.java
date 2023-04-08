@@ -6,13 +6,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.google.gson.JsonObject;
-import com.tsunderebug.speedrun4j.JsonData;
+import com.tsunderebug.speedrun4j.JsonObjectData;
 import com.tsunderebug.speedrun4j.Speedrun4J;
 import com.tsunderebug.speedrun4j.game.Game;
 import com.tsunderebug.speedrun4j.util.Undocumented;
 
 @Undocumented
-public class UndocumentedGame implements JsonData {
+public class UndocumentedGame implements JsonObjectData {
 
 	private final Speedrun4J s4j;
 	private final JsonObject data;
