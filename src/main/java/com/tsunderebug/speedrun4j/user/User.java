@@ -10,11 +10,9 @@ import java.util.function.Function;
 import com.google.gson.JsonObject;
 import com.tsunderebug.speedrun4j.LinkedJson;
 import com.tsunderebug.speedrun4j.Speedrun4J;
-import com.tsunderebug.speedrun4j._fedata.UserStats;
 import com.tsunderebug.speedrun4j.game.Game;
 import com.tsunderebug.speedrun4j.util.Pagination;
 import com.tsunderebug.speedrun4j.util.URIFixer;
-import com.tsunderebug.speedrun4j.util.Undocumented;
 
 public class User implements LinkedJson {
 	
@@ -109,11 +107,6 @@ public class User implements LinkedJson {
 	
 	public Record[] getPBs() throws IOException {
 		return null;
-	}
-	
-	@Undocumented
-	public UserStats getUserStats() throws IOException {
-		return s4j.getUserStats(getId());
 	}
 
 	@Override

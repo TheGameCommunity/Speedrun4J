@@ -10,6 +10,7 @@ import com.tsunderebug.speedrun4j.LinkedJson;
 import com.tsunderebug.speedrun4j.Speedrun4J;
 import com.tsunderebug.speedrun4j.WebLinked;
 import com.tsunderebug.speedrun4j.game.run.Ruleset;
+import com.tsunderebug.speedrun4j.game.run.Run;
 import com.tsunderebug.speedrun4j.platform.Platform;
 import com.tsunderebug.speedrun4j.user.GameStaff;
 import com.tsunderebug.speedrun4j.user.Moderator;

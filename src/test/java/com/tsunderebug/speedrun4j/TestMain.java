@@ -27,21 +27,10 @@ public class TestMain {
 				}
 			}*/
 			System.out.println(gson.toJson(user.getData()));
-			//URL games = user.getLink("games");
 			Pagination<Game> games = user.getModeratedGames().setMaxSize(20);
 			
 			for(Game g : games) {
 				System.out.println(g.getName());
-			}
-
-			PlayedGame[] playedgames = user.getUserStats().getPlayedGames();
-			for(PlayedGame g: playedgames) {
-				System.out.println(g.getName() + ": " + g.getTotalRuns() + " runs");
-			}
-			
-			ModeratedGame[] moderatedGames = user.getUserStats().getModeratedGames();
-			for(ModeratedGame g: moderatedGames) {
-				System.out.println(g.getName() + ": " + g.getModLevel());
 			}
 			
 			for(Category category : game.getCategories()) {
